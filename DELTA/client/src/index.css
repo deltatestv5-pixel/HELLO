@@ -1,0 +1,430 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light theme (default) */
+    --background: hsl(0, 0%, 100%);
+    --foreground: hsl(222, 84%, 15%);
+    --border: hsl(214, 32%, 91%);
+    --card: hsl(0, 0%, 100%);
+    --card-foreground: hsl(222, 84%, 15%);
+    --popover: hsl(0, 0%, 100%);
+    --popover-foreground: hsl(222, 84%, 15%);
+    --primary: hsl(214, 100%, 59%);
+    --primary-foreground: hsl(210, 40%, 98%);
+    --secondary: hsl(210, 40%, 96%);
+    --secondary-foreground: hsl(222, 84%, 15%);
+    --muted: hsl(210, 40%, 96%);
+    --muted-foreground: hsl(215, 16%, 47%);
+    --accent: hsl(210, 40%, 96%);
+    --accent-foreground: hsl(222, 84%, 15%);
+    --destructive: hsl(0, 84%, 60%);
+    --destructive-foreground: hsl(210, 40%, 98%);
+    --input: hsl(214, 32%, 91%);
+    --ring: hsl(214, 100%, 59%);
+    --radius: 0.75rem;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --discord-blurple: hsl(235, 86%, 65%);
+    --discord-green: hsl(139, 47%, 47%);
+    --discord-red: hsl(359, 82%, 59%);
+    --discord-yellow: hsl(38, 95%, 54%);
+  }
+
+  .dark {
+    /* Dark theme */
+    --background: hsl(222, 84%, 5%);
+    --foreground: hsl(213, 31%, 91%);
+    --border: hsl(217, 33%, 25%);
+    --card: hsl(217, 33%, 17%);
+    --card-foreground: hsl(213, 31%, 91%);
+    --popover: hsl(217, 33%, 17%);
+    --popover-foreground: hsl(213, 31%, 91%);
+    --primary: hsl(214, 100%, 59%);
+    --primary-foreground: hsl(222, 84%, 5%);
+    --secondary: hsl(217, 33%, 17%);
+    --secondary-foreground: hsl(213, 31%, 91%);
+    --muted: hsl(217, 33%, 17%);
+    --muted-foreground: hsl(215, 20%, 65%);
+    --accent: hsl(262, 83%, 58%);
+    --accent-foreground: hsl(213, 31%, 91%);
+    --destructive: hsl(0, 84%, 60%);
+    --destructive-foreground: hsl(213, 31%, 91%);
+    --input: hsl(217, 33%, 17%);
+    --ring: hsl(214, 100%, 59%);
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Light theme background */
+  :root body {
+    background-image: 
+      radial-gradient(at 47% 33%, hsl(214, 100%, 80%, 0.15) 0, transparent 59%), 
+      radial-gradient(at 82% 65%, hsl(262, 83%, 80%, 0.15) 0, transparent 55%);
+    background-attachment: fixed;
+  }
+
+  /* Dark theme background */
+  .dark body {
+    background-image: 
+      radial-gradient(at 47% 33%, hsl(214, 100%, 59%, 0.12) 0, transparent 59%), 
+      radial-gradient(at 82% 65%, hsl(262, 83%, 58%, 0.12) 0, transparent 55%);
+    background-attachment: fixed;
+  }
+}
+
+/* Custom scrollbar - theme aware */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--card);
+  transition: background-color 0.3s ease;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Light theme scrollbar adjustments */
+:root ::-webkit-scrollbar-track {
+  background: hsl(210, 40%, 96%);
+}
+:root ::-webkit-scrollbar-thumb {
+  background: hsl(215, 16%, 85%);
+}
+:root ::-webkit-scrollbar-thumb:hover {
+  background: hsl(215, 16%, 75%);
+}
+
+/* Dark theme scrollbar adjustments */
+.dark ::-webkit-scrollbar-track {
+  background: hsl(217, 33%, 17%);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: hsl(217, 33%, 25%);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: hsl(215, 20%, 65%);
+}
+
+/* Delta triangle animations */
+.delta-triangle {
+  width: 120px;
+  height: 120px;
+  background: white;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.6));
+  transform: rotate(10deg);
+  animation: triangleFloat 6s ease-in-out infinite;
+}
+
+@keyframes triangleFloat {
+  0%, 100% { transform: rotate(10deg) translateY(0px); }
+  50% { transform: rotate(10deg) translateY(-10px); }
+}
+
+.triangle-glow {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* Landing page animations */
+.slide-up {
+  animation: slideUp 0.8s ease-out forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Enhanced card hover effects */
+.card-hover {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+.card-hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+.card-hover:hover::before {
+  transform: translateX(100%);
+}
+.card-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+/* Feature card gradient animation */
+.feature-card-gradient {
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Animated background gradients */
+.animate-gradient-shift {
+  background-size: 400% 400%;
+  animation: gradientMove 8s ease-in-out infinite;
+}
+
+.animate-gradient-shift-reverse {
+  background-size: 400% 400%;
+  animation: gradientMoveReverse 10s ease-in-out infinite;
+}
+
+@keyframes gradientMove {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 50% 100%; }
+  75% { background-position: 50% 0%; }
+}
+
+@keyframes gradientMoveReverse {
+  0%, 100% { background-position: 100% 50%; }
+  25% { background-position: 0% 50%; }
+  50% { background-position: 50% 0%; }
+  75% { background-position: 50% 100%; }
+}
+
+/* Feature icon animations */
+.feature-icon-animate {
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(2deg); }
+  50% { transform: translateY(-3px) rotate(0deg); }
+  75% { transform: translateY(-7px) rotate(-2deg); }
+}
+
+/* Triangle clip path utility */
+.clip-path-triangle {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+/* Enhanced loading animations */
+@keyframes triangleFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-8px) rotate(3deg); }
+  66% { transform: translateY(-5px) rotate(-3deg); }
+}
+
+.animate-triangleFloat {
+  animation: triangleFloat 3s ease-in-out infinite;
+}
+
+.feature-icon-animate:hover {
+  animation: iconBounce 0.6s ease-in-out;
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-10px) scale(1.1); }
+}
+
+/* File upload styling */
+.file-upload-area {
+  transition: all 0.3s ease;
+}
+.file-upload-area:hover {
+  border-color: var(--primary);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+/* Enhanced status indicators with improved animations */
+.status-online {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  animation: pulse-green-status 3s infinite;
+}
+.status-offline {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+.status-starting {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+  animation: pulse-yellow-status 1.5s infinite;
+}
+.status-error {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+  animation: pulse-red-status 2s infinite;
+}
+
+@keyframes pulse-green-status {
+  0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.6); }
+}
+
+@keyframes pulse-yellow-status {
+  0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.7); }
+}
+
+@keyframes pulse-red-status {
+  0%, 100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+}
+
+/* Enhanced gradient backgrounds for stats */
+.stat-gradient-memory {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(147, 51, 234, 0.12) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
+}
+
+.stat-gradient-uptime {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(16, 185, 129, 0.12) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.1);
+}
+
+.stat-gradient-cpu {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(236, 72, 153, 0.12) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  box-shadow: 0 8px 32px rgba(168, 85, 247, 0.1);
+}
+
+/* Console terminal gradient styling */
+.console-gradient {
+  background: linear-gradient(135deg, 
+    rgba(15, 23, 42, 0.95) 0%, 
+    rgba(30, 41, 59, 0.95) 25%,
+    rgba(15, 23, 42, 0.95) 50%,
+    rgba(51, 65, 85, 0.95) 75%,
+    rgba(15, 23, 42, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced modern card gradient */
+.modern-card-gradient {
+  background: linear-gradient(135deg, 
+    rgba(30, 41, 59, 0.8) 0%, 
+    rgba(51, 65, 85, 0.6) 25%,
+    rgba(30, 41, 59, 0.8) 50%,
+    rgba(71, 85, 105, 0.6) 75%,
+    rgba(30, 41, 59, 0.8) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Support page gradient styling */
+.support-hero-gradient {
+  background: linear-gradient(135deg, 
+    rgba(88, 101, 242, 0.15) 0%, 
+    rgba(139, 92, 246, 0.15) 25%,
+    rgba(168, 85, 247, 0.15) 50%,
+    rgba(236, 72, 153, 0.15) 75%,
+    rgba(59, 130, 246, 0.15) 100%);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* Enhanced glassmorphism effect */
+.glass-card {
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Discord button styling */
+.discord-btn {
+  background: linear-gradient(135deg, #5865F2, #4752C4);
+  transition: all 0.3s ease;
+}
+.discord-btn:hover {
+  background: linear-gradient(135deg, #4752C4, #3C3F8C);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(88, 101, 242, 0.3);
+}
+
+/* Additional utility classes */
+.clip-path-triangle {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 640px) {
+  .delta-triangle {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .triangle-glow {
+    inset: -15px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    background-attachment: scroll;
+  }
+}

@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delta Host - Free 24/7 Discord Bot Hosting</title>
+    <!-- Favicon -->
+    <link rel="icon" href="https://colidelabs.com/favicon.ico" type="image/x-icon">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Optional: Google Font - Inter for a modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to enhance Tailwind, e.g., scrollbar, font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Tailwind slate-900 */
+            color: #e2e8f0; /* Tailwind slate-200 */
+            background-image: 
+                radial-gradient(at 47% 33%, hsl(215.4, 16.3%, 46.7%) 0, transparent 59%), 
+                radial-gradient(at 82% 65%, hsl(215.4, 16.3%, 46.7%) 0, transparent 55%);
+            background-attachment: fixed;
+        }
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b; /* Tailwind slate-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569; /* Tailwind slate-600 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* Tailwind slate-500 */
+        }
+        /* File input custom styling */
+        input[type="file"]::-webkit-file-upload-button {
+            @apply mr-4 py-2 px-4 rounded-md border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition;
+        }
+        input[type="file"]::file-selector-button {
+            @apply mr-4 py-2 px-4 rounded-md border-0 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 cursor-pointer transition;
+        }
+        /* Animation for status indicator */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        /* Custom gradient backgrounds */
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    <script>
+        // Tailwind configuration
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'discord-blurple': '#5865F2',
+                        'discord-green': '#57F287',
+                        'discord-yellow': '#FEE75C',
+                        'discord-red': '#ED4245',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-700 to-purple-800 text-white p-4 shadow-lg sticky top-0 z-10">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/" class="text-3xl font-bold flex items-center">
+                <img src="https://colidelabs.com/colide-logo.png" alt="Delta Logo" class="h-8 mr-2 invert">
+                Delta Host
+            </a>
+            <nav class="hidden md:block">
+                <ul class="flex space-x-6">
+                    <li><a href="#" class="hover:text-blue-200 transition duration-200 flex items-center"><i class="fas fa-home mr-2"></i> Home</a></li>
+                    <li><a href="#" class="hover:text-blue-200 transition duration-200 flex items-center"><i class="fas fa-robot mr-2"></i> My Bots</a></li>
+                    <li><a href="#" class="hover:text-blue-200 transition duration-200 flex items-center"><i class="fas fa-question-circle mr-2"></i> FAQ</a></li>
+                    <li><a href="#" class="hover:text-blue-200 transition duration-200 flex items-center"><i class="fas fa-envelope mr-2"></i> Contact</a></li>
+                    <li><a href="#" class="bg-discord-blurple hover:bg-blue-600 py-2 px-4 rounded-md transition flex items-center"><i class="fab fa-discord mr-2"></i> Support Server</a></li>
+                </ul>
+            </nav>
+            <button class="md:hidden text-2xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow container mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Bot Upload Section (Sticky on larger screens) -->
+        <section class="md:col-span-1 gradient-bg rounded-xl shadow-2xl p-6 h-fit md:sticky md:top-6 card-hover">
+            <h2 class="text-2xl font-semibold mb-6 text-white flex items-center">
+                <i class="fas fa-cloud-upload-alt mr-3 text-blue-400"></i> Upload New Bot
+            </h2>
+            <form id="botUploadForm" class="space-y-4">
+                <div>
+                    <label for="botName" class="block text-sm font-medium text-slate-300 mb-1">Bot Name</label>
+                    <input type="text" id="botName" name="botName" required placeholder="My Awesome Bot"
+                           class="w-full p-3 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label for="botToken" class="block text-sm font-medium text-slate-300 mb-1">Discord Bot Token</label>
+                    <div class="relative">
+                        <input type="password" id="botToken" name="botToken" required placeholder="Paste your bot token here"
+                               class="w-full p-3 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10">
+                        <button type="button" id="toggleTokenVisibility" class="absolute right-3 top-3 text-slate-400 hover:text-slate-200">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1 flex items-center">
+                        <i class="fas fa-info-circle mr-1"></i> Never share your token with anyone!
+                    </p>
+                </div>
+                <div>
+                    <label for="botLanguage" class="block text-sm font-medium text-slate-300 mb-1">Bot Language</label>
+                    <select id="botLanguage" name="botLanguage" class="w-full p-3 bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="python">Python</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="typescript">TypeScript</option>
+                        <option value="java">Java</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="botFiles" class="block text-sm font-medium text-slate-300 mb-1">Bot Code Files</label>
+                    <div class="flex items-center justify-center w-full">
+                        <label for="botFiles" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-600 rounded-lg cursor-pointer bg-slate-700 hover:bg-slate-600 transition">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <i class="fas fa-cloud-upload-alt mb-2 text-2xl text-slate-400"></i>
+                                <p class="mb-2 text-sm text-slate-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                <p class="text-xs text-slate-500">.py, .js, .json, requirements.txt, package.json, etc.</p>
+                            </div>
+                            <input id="botFiles" name="botFiles" type="file" class="hidden" multiple required />
+                        </label>
+                    </div> 
+                    <div id="fileList" class="mt-2 text-xs text-slate-400"></div>
+                </div>
+                <div class="flex items-center">
+                    <input id="termsAgreement" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-600 rounded bg-slate-700">
+                    <label for="termsAgreement" class="ml-2 block text-sm text-slate-300">
+                        I agree to the <a href="#" class="text-blue-400 hover:underline">Terms of Service</a>
+                    </label>
+                </div>
+                <button type="submit" id="uploadButton"
+                        class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center transform hover:scale-[1.02]">
+                    <svg id="uploadSpinner" class="animate-spin h-5 w-5 mr-3 text-white hidden" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Deploy Bot</span>
+                </button>
+                <div id="uploadMessage" class="mt-4 p-3 rounded-md text-center text-sm font-medium hidden"></div>
+            </form>
+        </section>
+
+        <!-- Hosted Bots Section -->
+        <section class="md:col-span-2 gradient-bg rounded-xl shadow-2xl p-6 card-hover">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-white flex items-center">
+                    <i class="fas fa-server mr-3 text-purple-400"></i> Your Hosted Bots
+                </h2>
+                <div class="flex space-x-2">
+                    <button id="refreshAllBots" class="bg-slate-700 hover:bg-slate-600 text-white py-2 px-3 rounded-md transition flex items-center">
+                        <i class="fas fa-sync-alt mr-1"></i> Refresh All
+                    </button>
+                    <button id="statsButton" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-md transition flex items-center">
+                        <i class="fas fa-chart-line mr-1"></i> Stats
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats Dashboard (Initially Hidden) -->
+            <div id="statsDashboard" class="mb-6 p-4 bg-slate-700 rounded-lg hidden">
+                <h3 class="text-lg font-semibold text-white mb-3">Bot Statistics</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-800 p-4 rounded-lg text-center">
+                        <div class="text-3xl font-bold text-emerald-400">3</div>
+                        <div class="text-slate-400 text-sm">Total Bots</div>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-lg text-center">
+                        <div class="text-3xl font-bold text-blue-400">2</div>
+                        <div class="text-slate-400 text-sm">Running</div>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-lg text-center">
+                        <div class="text-3xl font-bold text-red-400">1</div>
+                        <div class="text-slate-400 text-sm">Stopped</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="botsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- Bot cards will be injected here by JavaScript -->
+                <p id="noBotsMessage" class="text-slate-400 text-center col-span-full py-10">
+                    <i class="fas fa-robot text-4xl mb-3 opacity-50"></i><br>
+                    No bots hosted yet. Upload one to get started!
+                </p>
+            </div>
+            <div id="generalMessage" class="mt-6 p-3 rounded-md text-center text-sm font-medium hidden"></div>
+        </section>
+    </main>
+
+    <!-- Features Section -->
+    <section class="container mx-auto px-6 py-10">
+        <h2 class="text-3xl font-bold text-center text-white mb-12">Why Choose Delta Host?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="gradient-bg p-6 rounded-xl shadow-lg card-hover">
+                <div class="text-blue-400 text-4xl mb-4">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Lightning Fast</h3>
+                <p class="text-slate-400">Our servers are optimized for Discord bots with low latency and high uptime.</p>
+            </div>
+            <div class="gradient-bg p-6 rounded-xl shadow-lg card-hover">
+                <div class="text-green-400 text-4xl mb-4">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Secure & Reliable</h3>
+                <p class="text-slate-400">Your bot tokens are encrypted and stored securely. Regular backups ensure no data loss.</p>
+            </div>
+            <div class="gradient-bg p-6 rounded-xl shadow-lg card-hover">
+                <div class="text-purple-400 text-4xl mb-4">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Easy Management</h3>
+                <p class="text-slate-400">Intuitive dashboard to start, stop, and monitor your bots with real-time logs.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 p-8 mt-8">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-white text-lg font-semibold mb-4">Delta Host</h3>
+                <p class="mb-4">Free 24/7 Discord bot hosting with premium features for developers of all skill levels.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-slate-400 hover:text-white transition"><i class="fab fa-discord text-xl"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-white transition"><i class="fab fa-github text-xl"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-white transition"><i class="fab fa-twitter text-xl"></i></a>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-white text-lg font-semibold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-white transition">Home</a></li>
+                    <li><a href="#" class="hover:text-white transition">My Bots</a></li>
+                    <li><a href="#" class="hover:text-white transition">Documentation</a></li>
+                    <li><a href="#" class="hover:text-white transition">Status</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-white text-lg font-semibold mb-4">Resources</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-white transition">API Documentation</a></li>
+                    <li><a href="#" class="hover:text-white transition">Bot Examples</a></li>
+                    <li><a href="#" class="hover:text-white transition">Community</a></li>
+                    <li><a href="#" class="hover:text-white transition">Support</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-white text-lg font-semibold mb-4">Legal</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
+                    <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-white transition">Cookie Policy</a></li>
+                    <li><a href="#" class="hover:text-white transition">DMCA</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container mx-auto mt-8 pt-6 border-t border-slate-800 text-center">
+            &copy; 2025 Delta Host. All rights reserved. Powered by <a href="https://colidelabs.com/" class="text-blue-400 hover:underline" target="_blank">ColideLabs</a>.
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Simulated backend API for demonstration purposes
+        class MockBackend {
+            constructor() {
+                this.bots = JSON.parse(localStorage.getItem('deltaHostedBots')) || [];
+                this.nextId = parseInt(localStorage.getItem('deltaNextBotId')) || 1;
+            }
+            
+            // Generate a random bot ID
+            generateBotId() {
+                const id = `bot_${this.nextId.toString().padStart(4, '0')}`;
+                this.nextId++;
+                localStorage.setItem('deltaNextBotId', this.nextId.toString());
+                return id;
+            }
+            
+            // Simulate API delay
+            async delay(ms = 500) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            // Upload a new bot
+            async uploadBot(botData) {
+                await this.delay(1500);
+                
+                const botId = this.generateBotId();
+                const newBot = {
+                    id: botId,
+                    name: botData.name || `Bot ${botId}`,
+                    language: botData.language || 'python',
+                    main_file: this.detectMainFile(botData.files, botData.language),
+                    status: 'stopped',
+                    created: new Date().toISOString(),
+                    last_started: null,
+                    cpu_usage: '0%',
+                    memory_usage: '0MB',
+                    uptime: '0s'
+                };
+                
+                this.bots.push(newBot);
+                this.saveToStorage();
+                
+                return {
+                    success: true,
+                    message: 'Bot uploaded successfully!',
+                    bot_id: botId,
+                    bot_info: newBot
+                };
+            }
+            
+            // Detect the main file from uploaded files
+            detectMainFile(files, language) {
+                if (language === 'python') {
+                    for (const file of files) {
+                        if (file.name.endsWith('.py') && 
+                            (file.name.toLowerCase().includes('bot') || 
+                             file.name.toLowerCase().includes('main') || 
+                             file.name === 'main.py')) {
+                            return file.name;
+                        }
+                    }
+                    return files.find(f => f.name.endsWith('.py'))?.name || 'Unknown';
+                } else if (language === 'javascript' || language === 'typescript') {
+                    for (const file of files) {
+                        if (file.name === 'index.js' || file.name === 'app.js' || 
+                            file.name === 'bot.js' || file.name === 'main.js') {
+                            return file.name;
+                        }
+                    }
+                    return files.find(f => f.name.endsWith('.js'))?.name || 'Unknown';
+                }
+                return files[0]?.name || 'Unknown';
+            }
+            
+            // Start a bot
+            async startBot(botId) {
+                await this.delay(1000);
+                
+                const bot = this.bots.find(b => b.id === botId);
+                if (!bot) {
+                    throw new Error('Bot not found');
+                }
+                
+                if (bot.status === 'running') {
+                    return { success: true, message: 'Bot is already running' };
+                }
+                
+                bot.status = 'running';
+                bot.last_started = new Date().toISOString();
+                // Simulate some resource usage
+                bot.cpu_usage = (Math.random() * 30 + 5).toFixed(1) + '%';
+                bot.memory_usage = (Math.random() * 50 + 20).toFixed(1) + 'MB';
+                
+                this.saveToStorage();
+                
+                return { 
+                    success: true, 
+                    message: 'Bot started successfully',
+                    status: bot.status
+                };
+            }
+            
+            // Stop a bot
+            async stopBot(botId) {
+                await this.delay(800);
+                
+                const bot = this.bots.find(b => b.id === botId);
+                if (!bot) {
+                    throw new Error('Bot not found');
+                }
+                
+                if (bot.status === 'stopped') {
+                    return { success: true, message: 'Bot is already stopped' };
+                }
+                
+                bot.status = 'stopped';
+                bot.cpu_usage = '0%';
+                bot.memory_usage = '0MB';
+                
+                // Calculate uptime if the bot was running
+                if (bot.last_started) {
+                    const startTime = new Date(bot.last_started);
+                    const now = new Date();
+                    const uptimeMs = now - startTime;
+                    const hours = Math.floor(uptimeMs / 3600000);
+                    const minutes = Math.floor((uptimeMs % 3600000) / 60000);
+                    const seconds = Math.floor((uptimeMs % 60000) / 1000);
+                    bot.uptime = `${hours}h ${minutes}m ${seconds}s`;
+                }
+                
+                this.saveToStorage();
+                
+                return { 
+                    success: true, 
+                    message: 'Bot stopped successfully',
+                    status: bot.status
+                };
+            }
+            
+            // Get bot status
+            async getBotStatus(botId) {
+                await this.delay(300);
+                
+                const bot = this.bots.find(b => b.id === botId);
+                if (!bot) {
+                    throw new Error('Bot not found');
+                }
+                
+                // If the bot is running, update its resource usage and uptime
+                if (bot.status === 'running' && bot.last_started) {
+                    // Simulate fluctuating resource usage
+                    bot.cpu_usage = (Math.random() * 20 + 10).toFixed(1) + '%';
+                    bot.memory_usage = (Math.random() * 30 + 30).toFixed(1) + 'MB';
+                    
+                    // Update uptime
+                    const startTime = new Date(bot.last_started);
+                    const now = new Date();
+                    const uptimeMs = now - startTime;
+                    const hours = Math.floor(uptimeMs / 3600000);
+                    const minutes = Math.floor((uptimeMs % 3600000) / 60000);
+                    const seconds = Math.floor((uptimeMs % 60000) / 1000);
+                    bot.uptime = `${hours}h ${minutes}m ${seconds}s`;
+                }
+                
+                this.saveToStorage();
+                
+                return { 
+                    success: true, 
+                    status: bot.status,
+                    bot_info: bot
+                };
+            }
+            
+            // Delete a bot
+            async deleteBot(botId) {
+                await this.delay(500);
+                
+                const index = this.bots.findIndex(b => b.id === botId);
+                if (index === -1) {
+                    throw new Error('Bot not found');
+                }
+                
+                this.bots.splice(index, 1);
+                this.saveToStorage();
+                
+                return { 
+                    success: true, 
+                    message: 'Bot deleted successfully'
+                };
+            }
+            
+            // Get all bots
+            async getAllBots() {
+                await this.delay(200);
+                return {
+                    success: true,
+                    bots: this.bots
+                };
+            }
+            
+            // Save data to localStorage
+            saveToStorage() {
+                localStorage.setItem('deltaHostedBots', JSON.stringify(this.bots));
+            }
+        }
+
+        // Initialize the mock backend
+        const API_BASE_URL = 'http://127.0.0.1:5000'; // This would be your actual backend URL
+        const mockBackend = new MockBackend();
+        const useMockBackend = true; // Set to false when you have a real backend
+
+        // --- DOM Elements ---
+        const botUploadForm = document.getElementById('botUploadForm');
+        const botNameInput = document.getElementById('botName');
+        const botTokenInput = document.getElementById('botToken');
+        const toggleTokenBtn = document.getElementById('toggleTokenVisibility');
+        const botLanguageSelect = document.getElementById('botLanguage');
+        const botFilesInput = document.getElementById('botFiles');
+        const fileList = document.getElementById('fileList');
+        const termsCheckbox = document.getElementById('termsAgreement');
+        const uploadButton = document.getElementById('uploadButton');
+        const uploadSpinner = document.getElementById('uploadSpinner');
+        const uploadMessage = document.getElementById('uploadMessage');
+        const botsContainer = document.getElementById('botsContainer');
+        const noBotsMessage = document.getElementById('noBotsMessage');
+        const generalMessage = document.getElementById('generalMessage');
+        const refreshAllBtn = document.getElementById('refreshAllBots');
+        const statsButton = document.getElementById('statsButton');
+        const statsDashboard = document.getElementById('statsDashboard');
+
+        // --- Global State ---
+        let hostedBots = [];
+
+        // --- Utility Functions ---
+        function updateLocalStorage() {
+            localStorage.setItem('deltaHostedBots', JSON.stringify(hostedBots));
+            toggleNoBotsMessage();
+        }
+
+        function toggleNoBotsMessage() {
+            if (hostedBots.length === 0) {
+                noBotsMessage.classList.remove('hidden');
+            } else {
+                noBotsMessage.classList.add('hidden');
+            }
+        }
+
+        function showMessage(element, message, type = 'info') {
+            element.textContent = message;
+            element.classList.remove('hidden', 'text-green-400', 'text-red-400', 'text-yellow-400', 'bg-green-900/20', 'bg-red-900/20', 'bg-yellow-900/20');
+            
+            if (type === 'success') {
+                element.classList.add('text-green-400', 'bg-green-900/20');
+            } else if (type === 'error') {
+                element.classList.add('text-red-400', 'bg-red-900/20');
+            } else if (type === 'warning') {
+                element.classList.add('text-yellow-400', 'bg-yellow-900/20');
+            } else {
+                element.classList.add('text-blue-400', 'bg-blue-900/20');
+            }
+        }
+
+        // --- API Interaction Functions ---
+        async function apiRequest(method, endpoint, data = null, isFormData = false) {
+            // Clear previous messages before a new action
+            uploadMessage.classList.add('hidden');
+            generalMessage.classList.add('hidden');
+            
+            if (useMockBackend) {
+                // Use mock backend for demonstration
+                try {
+                    let result;
+                    switch (endpoint) {
+                        case '/upload_bot':
+                            result = await mockBackend.uploadBot(data);
+                            break;
+                        case '/start_bot':
+                            const botId = endpoint.split('/')[2];
+                            result = await mockBackend.startBot(botId);
+                            break;
+                        case '/stop_bot':
+                            const stopBotId = endpoint.split('/')[2];
+                            result = await mockBackend.stopBot(stopBotId);
+                            break;
+                        case '/bot_status':
+                            const statusBotId = endpoint.split('/')[2];
+                            result = await mockBackend.getBotStatus(statusBotId);
+                            break;
+                        case '/delete_bot':
+                            const deleteBotId = endpoint.split('/')[2];
+                            result = await mockBackend.deleteBot(deleteBotId);
+                            break;
+                        case '/get_bots':
+                            result = await mockBackend.getAllBots();
+                            break;
+                        default:
+                            throw new Error(`Unknown endpoint: ${endpoint}`);
+                    }
+                    return result;
+                } catch (error) {
+                    throw error;
+                }
+            } else {
+                // Real backend implementation
+                const url = `${API_BASE_URL}${endpoint}`;
+                const options = {
+                    method: method,
+                    headers: {}
+                };
+
+                if (isFormData) {
+                    options.body = data;
+                } else if (data) {
+                    options.headers['Content-Type'] = 'application/json';
+                    options.body = JSON.stringify(data);
+                }
+
+                try {
+                    const response = await fetch(url, options);
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.error || `Server responded with status: ${response.status}`);
+                    }
+                    return result;
+                } catch (error) {
+                    console.error(`API Request to ${endpoint} failed:`, error);
+                    throw error;
+                }
+            }
+        }
+
+        async function uploadBot(botData) {
+            uploadButton.disabled = true;
+            uploadSpinner.classList.remove('hidden');
+            
+            try {
+                const formData = new FormData();
+                formData.append('name', botData.name);
+                formData.append('bot_token', botData.token);
+                formData.append('language', botData.language);
+                
+                for (const file of botData.files) {
+                    formData.append('bot_files', file);
+                }
+
+                const result = await apiRequest('POST', '/upload_bot', formData, true);
+                showMessage(uploadMessage, result.message, 'success');
+                
+                hostedBots.push({
+                    id: result.bot_id,
+                    name: result.bot_info.name,
+                    language: result.bot_info.language,
+                    main_file: result.bot_info.main_file,
+                    status: result.bot_info.status,
+                    created: result.bot_info.created,
+                    last_started: result.bot_info.last_started,
+                    cpu_usage: result.bot_info.cpu_usage,
+                    memory_usage: result.bot_info.memory_usage,
+                    uptime: result.bot_info.uptime
+                });
+                
+                updateLocalStorage();
+                renderBots();
+                botUploadForm.reset();
+                fileList.innerHTML = '';
+            } catch (error) {
+                showMessage(uploadMessage, `Upload failed: ${error.message}`, 'error');
+            } finally {
+                uploadButton.disabled = false;
+                uploadSpinner.classList.add('hidden');
+            }
+        }
+
+        async function startBot(botId) {
+            showMessage(generalMessage, `Starting bot ${botId.substring(0,8)}...`, 'info');
+            
+            try {
+                const result = await apiRequest('POST', `/start_bot/${botId}`);
+                showMessage(generalMessage, result.message, 'success');
+                updateBotStatusInList(botId, 'running');
+            } catch (error) {
+                showMessage(generalMessage, `Failed to start bot: ${error.message}`, 'error');
+            } finally {
+                renderBots();
+            }
+        }
+
+        async function stopBot(botId) {
+            showMessage(generalMessage, `Stopping bot ${botId.substring(0,8)}...`, 'info');
+            
+            try {
+                const result = await apiRequest('POST', `/stop_bot/${botId}`);
+                showMessage(generalMessage, result.message, 'success');
+                updateBotStatusInList(botId, 'stopped');
+            } catch (error) {
+                showMessage(generalMessage, `Failed to stop bot: ${error.message}`, 'error');
+            } finally {
+                renderBots();
+            }
+        }
+
+        async function getBotStatus(botId) {
+            try {
+                const result = await apiRequest('GET', `/bot_status/${botId}`);
+                updateBotInList(botId, result.bot_info);
+                return result.status;
+            } catch (error) {
+                console.error(`Error fetching status for bot ${botId}:`, error);
+                return 'unknown_error';
+            } finally {
+                renderBots();
+            }
+        }
+
+        async function deleteBot(botId) {
+            showMessage(generalMessage, `Deleting bot ${botId.substring(0,8)}...`, 'info');
+            
+            try {
+                const result = await apiRequest('DELETE', `/delete_bot/${botId}`);
+                showMessage(generalMessage, result.message, 'success');
+                
+                hostedBots = hostedBots.filter(b => b.id !== botId);
+                updateLocalStorage();
+                renderBots();
+            } catch (error) {
+                showMessage(generalMessage, `Failed to delete bot: ${error.message}`, 'error');
+            }
+        }
+
+        async function refreshAllBots() {
+            showMessage(generalMessage, 'Refreshing all bots...', 'info');
+            
+            try {
+                for (const bot of hostedBots) {
+                    await getBotStatus(bot.id);
+                }
+                showMessage(generalMessage, 'All bots refreshed successfully', 'success');
+            } catch (error) {
+                showMessage(generalMessage, `Error refreshing bots: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadAllBots() {
+            try {
+                const result = await apiRequest('GET', '/get_bots');
+                hostedBots = result.bots || [];
+                updateLocalStorage();
+                renderBots();
+            } catch (error) {
+                console.error('Failed to load bots:', error);
+            }
+        }
+
+        // --- UI Rendering & State Management Functions ---
+        function getStatusClass(status) {
+            switch (status) {
+                case 'running': return 'bg-discord-green';
+                case 'stopped': return 'bg-discord-red';
+                case 'uploaded': return 'bg-blue-500';
+                case 'failed_to_start':
+                case 'failed_to_stop':
+                case 'unknown_error':
+                    return 'bg-yellow-500';
+                default: return 'bg-gray-500';
+            }
+        }
+
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'running': return 'fa-play-circle';
+                case 'stopped': return 'fa-stop-circle';
+                case 'uploaded': return 'fa-upload';
+                case 'failed_to_start':
+                case 'failed_to_stop':
+                case 'unknown_error':
+                    return 'fa-exclamation-circle';
+                default: return 'fa-question-circle';
+            }
+        }
+
+        function updateBotStatusInList(botId, newStatus) {
+            const botIndex = hostedBots.findIndex(bot => bot.id === botId);
+            if (botIndex > -1) {
+                hostedBots[botIndex].status = newStatus;
+                updateLocalStorage();
+            }
+        }
+
+        function updateBotInList(botId, newData) {
+            const botIndex = hostedBots.findIndex(bot => bot.id === botId);
+            if (botIndex > -1) {
+                hostedBots[botIndex] = { ...hostedBots[botIndex], ...newData };
+                updateLocalStorage();
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Never';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        function createBotCard(bot) {
+            const botCard = document.createElement('div');
+            botCard.id = `bot-card-${bot.id}`;
+            botCard.className = 'bg-slate-700 p-4 rounded-lg shadow-md flex flex-col justify-between transition-all duration-300 hover:shadow-xl';
+
+            const statusClass = getStatusClass(bot.status);
+            const statusIcon = getStatusIcon(bot.status);
+
+            botCard.innerHTML = `
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-semibold text-white truncate" title="${bot.name}">${bot.name}</h3>
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${statusClass} text-white capitalize flex items-center">
+                            <i class="fas ${statusIcon} mr-1"></i> ${bot.status.replace(/_/g, ' ')}
+                        </span>
+                    </div>
+                    <p class="text-slate-300 text-sm mb-1">ID: <span class="font-mono text-blue-300">${bot.id}</span></p>
+                    <p class="text-slate-300 text-sm mb-1">Language: <span class="font-medium text-white">${bot.language || 'Unknown'}</span></p>
+                    <p class="text-slate-300 text-sm mb-1">Main File: <span class="font-medium text-white">${bot.main_file || 'N/A'}</span></p>
+                    
+                    ${bot.status === 'running' ? `
+                    <div class="mt-3 pt-2 border-t border-slate-600">
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="text-slate-400">CPU: <span class="text-white">${bot.cpu_usage || '0%'}</span></div>
+                            <div class="text-slate-400">Memory: <span class="text-white">${bot.memory_usage || '0MB'}</span></div>
+                            <div class="text-slate-400">Uptime: <span class="text-white">${bot.uptime || '0s'}</span></div>
+                            <div class="text-slate-400">Last started: <span class="text-white">${formatDate(bot.last_started)}</span></div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <p class="text-slate-500 text-xs mt-2">Created: ${formatDate(bot.created)}</p>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-600">
+                    <button class="btn-action bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-md text-sm transition flex items-center" data-action="start" data-id="${bot.id}" ${bot.status === 'running' ? 'disabled' : ''}>
+                        <i class="fas fa-play mr-1"></i> Start
+                    </button>
+                    <button class="btn-action bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded-md text-sm transition flex items-center" data-action="stop" data-id="${bot.id}" ${bot.status !== 'running' ? 'disabled' : ''}>
+                        <i class="fas fa-stop mr-1"></i> Stop
+                    </button>
+                    <button class="btn-action bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-md text-sm transition flex items-center" data-action="refresh" data-id="${bot.id}">
+                        <i class="fas fa-sync-alt mr-1"></i> Refresh
+                    </button>
+                    <button class="btn-action bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-3 rounded-md text-sm transition flex items-center" data-action="logs" data-id="${bot.id}">
+                        <i class="fas fa-scroll mr-1"></i> Logs
+                    </button>
+                    <button class="btn-action bg-discord-red hover:bg-red-700 text-white py-2 px-3 rounded-md text-sm transition flex items-center" data-action="delete" data-id="${bot.id}">
+                        <i class="fas fa-trash-alt mr-1"></i> Delete
+                    </button>
+                </div>
+            `;
+
+            botCard.querySelectorAll('.btn-action').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const action = e.target.closest('.btn-action').dataset.action;
+                    const id = e.target.closest('.btn-action').dataset.id;
+                    
+                    const btn = e.target.closest('.btn-action');
+                    btn.disabled = true;
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                    try {
+                        switch (action) {
+                            case 'start': await startBot(id); break;
+                            case 'stop': await stopBot(id); break;
+                            case 'refresh': await getBotStatus(id); break;
+                            case 'logs': 
+                                showMessage(generalMessage, `Logs feature would open for bot ${id.substring(0,8)}...`, 'info');
+                                break;
+                            case 'delete': 
+                                if (confirm(`Are you sure you want to delete bot "${hostedBots.find(b => b.id === id)?.name}"? This action cannot be undone.`)) {
+                                    await deleteBot(id);
+                                }
+                                break;
+                        }
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = originalHtml;
+                    }
+                });
+            });
+
+            return botCard;
+        }
+
+        function renderBots() {
+            botsContainer.innerHTML = '';
+            toggleNoBotsMessage();
+
+            if (hostedBots.length === 0) {
+                return;
+            }
+
+            hostedBots.forEach(bot => {
+                botsContainer.appendChild(createBotCard(bot));
+            });
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllBots();
+            
+            // Set up file input display
+            botFilesInput.addEventListener('change', (e) => {
+                fileList.innerHTML = '';
+                if (e.target.files.length > 0) {
+                    const fileCount = document.createElement('div');
+                    fileCount.textContent = `${e.target.files.length} file(s) selected:`;
+                    fileList.appendChild(fileCount);
+                    
+                    const fileNames = document.createElement('ul');
+                    fileNames.className = 'ml-4 mt-1';
+                    
+                    for (const file of e.target.files) {
+                        const li = document.createElement('li');
+                        li.textContent = file.name;
+                        fileNames.appendChild(li);
+                    }
+                    
+                    fileList.appendChild(fileNames);
+                }
+            });
+            
+            // Toggle token visibility
+            let tokenVisible = false;
+            toggleTokenBtn.addEventListener('click', () => {
+                tokenVisible = !tokenVisible;
+                botTokenInput.type = tokenVisible ? 'text' : 'password';
+                toggleTokenBtn.innerHTML = tokenVisible ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+            });
+            
+            // Refresh all bots
+            refreshAllBtn.addEventListener('click', refreshAllBots);
+            
+            // Toggle stats dashboard
+            statsButton.addEventListener('click', () => {
+                statsDashboard.classList.toggle('hidden');
+            });
+            
+            // Form submission
+            botUploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const botName = botNameInput.value;
+                const botToken = botTokenInput.value;
+                const botLanguage = botLanguageSelect.value;
+                const botFiles = botFilesInput.files;
+                
+                if (!botName) {
+                    showMessage(uploadMessage, 'Please provide a name for your bot', 'error');
+                    return;
+                }
+                
+                if (!botToken) {
+                    showMessage(uploadMessage, 'Please provide your Discord bot token', 'error');
+                    return;
+                }
+                
+                if (botFiles.length === 0) {
+                    showMessage(uploadMessage, 'Please select your bot code files', 'error');
+                    return;
+                }
+                
+                if (!termsCheckbox.checked) {
+                    showMessage(uploadMessage, 'Please agree to the Terms of Service', 'error');
+                    return;
+                }
+                
+                await uploadBot({
+                    name: botName,
+                    token: botToken,
+                    language: botLanguage,
+                    files: Array.from(botFiles)
+                });
+            });
+        });
+    </script>
+</body>
+</html>
